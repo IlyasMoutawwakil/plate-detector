@@ -13,7 +13,7 @@ Only with some image processing operations (OpenCV) and a negative background da
 And for the detection I re-implemented the YOLO algorithm in Google's ML framework TensorFlow.
 
 ## Let's make it even more challenging
-To make this solution cheaper and to implement it in small embedded systems such as Raspberry Pi, I went through different CNN architectures and modified the original features extractor (Darknet) with Google's fastest (SqueezeNet).
+To make this solution cheaper and to implement it in small embedded systems such as Raspberry Pi, I went through different CNN architectures and modified the original features extractor (Darknet) with Google and Stanford's fastest (SqueezeNet and MobileNet).
 With these modifications I achieved real time (30 fps) detection with less memory, less training time and less computation.
 
 ## Results
