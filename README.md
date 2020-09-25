@@ -10,6 +10,11 @@ The only problem with this approach was the dataset. I could've used a dataset f
 
 ## Solution
 Only with some image processing operations (OpenCV) and a negative background dataset (images of random scenes), I built a data generator that generates images with car plates (Moroccan car plate) along with the needed annotations (coordinates) in no time. And to make the detection harder I added noise on top of the images, I tilted the car plates and rotated them along both axes.
+
+<p align="center">
+  <img src="tex\figures\Gen_process.PNG" width="500" alt="1">
+</p>
+
 And for the detection I re-implemented the YOLO algorithm in Google's ML framework TensorFlow.
 
 ## Let's make it even more challenging
