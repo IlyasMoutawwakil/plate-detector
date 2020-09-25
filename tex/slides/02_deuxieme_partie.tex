@@ -1,0 +1,134 @@
+% Titre de la partie
+\section{La théorie des réseaux de neurones artificiels}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Première diapo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+
+\begin{frame}
+\frametitle{Réseau de neurones artificiels}
+\framesubtitle{Perceptron}
+\begin{columns}
+    \begin{column}{6cm}
+        \begin{itemize}
+            \item<1->   Le perceptron : Une fonction à paramètres ajustables.
+        \end{itemize}
+        \centering
+        \begin{figure}
+        \includestandalone[width=1.0\textwidth]{preambule/perceptron}
+        \end{figure}
+        $$S=A(\sum_{i=1}^{n} (e_i . p_i) + b)$$
+    \end{column}
+\begin{column}{6cm}
+    \begin{itemize}
+    \item<2->La fonction d'activation A.
+    \begin{itemize}
+    \item<2->Heaviside:
+    \[A(x) =\begin{cases}
+                                   0 & \text{if $x\leqslant0$} \\
+                                   1 & \text{if $x>0$}
+            \end{cases}\]
+    \item<2->Sigmoid : 
+    $$ A(x) = \frac{1}{1+exp(-x)}$$
+    \item<2->RELU:
+    \[A(x) =\begin{cases}
+                                   0 & \text{if $x\leqslant0$} \\
+                                   x & \text{if $x>0$}
+            \end{cases}\]
+    \end{itemize}
+    \end{itemize}
+\end{column}
+\end{columns}
+\end{frame}
+
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Deuxième diapo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Réseau de neurones artificiels}
+\framesubtitle{Réseau profond}
+\begin{itemize}
+    \item<1->   Le théorème d'approximation universelle.
+    
+    %the so called Universal approximation theorem, proved by Cybenko in 1989 and generalized by various people in the 1990s. It basically says that a shallow neural network (with 1 hidden layer) can approximate any function, i.e. can in principle learn anything. This is true for various nonlinear activation functions, including rectified linear units that most neural networks are using today
+    %If so, then why is everybody using deep nets?
+    
+    \item<2->   Pourquoi un réseau multi-couches (Profond) ?
+\end{itemize}
+\centering
+\begin{figure}
+    \begin{overprint}
+        \onslide<1>\centering\includestandalone[width=0.6\textwidth]{preambule/one_layer_perceptron}\caption{Réseau
+        mono-couche}
+        \onslide<2>\centering\includestandalone[width=0.6\textwidth]{preambule/mul_layer_perceptron}\caption{Réseau multi--couche}
+    \end{overprint}
+\end{figure}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Troisième diapo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Algorithme d'apprentisage}
+\framesubtitle{Modélisation du problème}
+\begin{itemize}
+    \item<1->   Base de données annotées : ${(x_1,y_1), \ldots,(x_n,y_n)}$ .
+    \item<2->   Fonction paramétrée : $f_P:\X \to \Y$ .
+    \item<2->   Fonctions de coût : $ \L_i:\P\to\R \quad ; \quad  \L(P)=\frac{1}{n}\sum_{i=1}^n \L_i(P)$ .
+\end{itemize}
+
+\begin{columns}
+    \begin{column}{6cm}
+        %\begin{itemize}
+            % Une fonction generalement continue vectoriell : Le cout d'une maison en fonction de sa surface, position et durée de construction.
+            %\item<4->   Moyenne d'Erreur Carrée
+        %\end{itemize}
+        \begin{figure}
+        \begin{overprint}
+            \onslide<1-2>\centering\includestandalone[width=0.6\textwidth]{preambule/linear_reg_data}\caption{Problème de regréssion}
+            \onslide<3>\centering\includestandalone[width=0.6\textwidth]{preambule/linear_reg_func}\caption{Fonction de régression}
+        \end{overprint}
+    \end{figure}
+    \end{column}
+    \begin{column}{6cm}
+        %\begin{itemize}
+            % Une fonction generalement discontinue qui arrive dans N : Le chiffre ecrit sur une image 28*28 (Probleme MNIST)
+            %\item<4->   Entropie Croisée Binaire
+        %\end{itemize}
+        \begin{figure}
+        \begin{overprint}
+            \onslide<1-2>\centering\includestandalone[width=0.6\textwidth]{preambule/class_data}\caption{Problème de classification}
+            \onslide<3>\centering\includestandalone[width=0.6\textwidth]{preambule/class_borders}\caption{Frontière de décision}
+        \end{overprint}
+        \end{figure}
+    \end{column}
+\end{columns}
+\end{frame}
+
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+% Quatrième diapo
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+\begin{frame}
+\frametitle{Algorithme d'apprentisage}
+\framesubtitle{La minimisation d'une fonction}
+\begin{columns}
+    \begin{column}{6cm}
+        \begin{itemize}
+            \item<1->   $\L$ est une fonction définie sur l'espace de poids.
+            \item<2->   Objectif : Trouver la valeur de $P^{*}$ qui minimise $\L$.
+            \item<3->   Méthode : Descente de gradient $$ P^{(i+1)}=P^{(i)} - {\eta}_i \nabla \L (P^{(i)}) $$
+            % La base de donnees etant fixee, la dimension de l'espace des poids est egale au nombre de parametres Pij
+        \end{itemize}
+    \end{column}
+    \begin{column}{6cm}
+    \begin{figure}
+        \begin{overprint}
+            \onslide<1>\includestandalone[width=1\textwidth]{preambule/loss_3d}\caption{La forme de $\L$ : cas de deux paramètres}
+            \onslide<2>\includestandalone[width=1\textwidth]{preambule/loss_minimum}\caption{Le minimum de $\L$ : cas de deux paramètres}
+            \onslide<3>\includestandalone[width=0.8\textwidth]{preambule/loss_proj_grad_desc}\caption{Le chemin de descente}
+        \end{overprint}
+    \end{figure}
+    \end{column}
+\end{columns}
+\end{frame}

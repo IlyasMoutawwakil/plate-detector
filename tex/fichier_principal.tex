@@ -1,0 +1,50 @@
+% On découpe ce document complexe en plusieurs sous-fichiers séparés.
+% Cela permettra notamment de réarranger les transparents facilement 
+% lors de l'élaboration du document.
+
+% La définition de la classe beamer avec tous les styles afférents
+
+\RequirePackage{currfile} 
+
+\documentclass{beamer}
+
+\input{preambule/special_beamer.tex}
+
+% Les autres packages utiles  notamment pour le français, les accents ou Python
+\input{preambule/autres_packages.tex}
+% Les macros et raccourcis personnels
+\input{preambule/macros.tex}
+
+% On définit le titre et l'auteur du document
+
+% L'argument optionnel (entre crochets) donne le titre qui sera mis sur chaque slide
+\title[TIPE : DPI]{Détecteur des Plaques d’Immatriculation (DPI) : Application dans un parking}
+\author{Ilyas \textsc{Moutawwakil} : BE026T} % Votre nom
+% L'épreuve (car on n'a pas le droit de signaler sa provenance à un concours) (là encore, l'argument optionnel apparaît sur chaque slide)
+\institute[TIPE]{Épreuve de TIPE}
+\date{Session 2019} 
+\pgfplotsset{compat=1.15}
+% On démarre le document proprement dit
+\begin{document}
+
+% La page de titre et la table des matières
+\input{slides/00_titre_et_tdm.tex}
+
+% La première grande partie: introduction du sujet
+\input{slides/01_premiere_partie.tex}
+
+% La 2e partie: Le point de vue de la relativité restreinte
+\input{slides/02_deuxieme_partie.tex}
+
+% La 3e partie: Le point de vue de la relativité générale
+\input{slides/03_troisieme_partie.tex}
+
+% Réalisation
+\input{slides/04_realisation.tex}
+
+% Conclusion
+\input{slides/05_conclusion.tex}
+
+\end{document}
+
+

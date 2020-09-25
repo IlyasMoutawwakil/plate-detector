@@ -1,0 +1,60 @@
+% Ce fichier contient toutes les macros que vous pouvez avoir envie de définir 
+% si vous les utilisez plusieurs fois dans le document.
+
+\PassOptionsToPackage{svgnames}{color}
+
+% Un environnement pour bien présenter le code informatique
+\newenvironment{code}{%
+\begin{mdframed}[linecolor=green,innerrightmargin=30pt,innerleftmargin=30pt,
+backgroundcolor=black!5,
+skipabove=10pt,skipbelow=10pt,roundcorner=5pt,
+splitbottomskip=6pt,splittopskip=12pt]
+}{%
+\end{mdframed}
+}
+
+% Un raccourci pour composer les unités correctement (en droit)
+% Exemple: $v = 10\U{m.s^{-1}}$
+\newcommand{\U}[1]{~\mathrm{#1}}
+
+% Les guillemets \ofg{par exemple}
+\newcommand{\ofg}[1]{\og{}#1\fg{}}
+
+\def\L{{\mathcal L}}
+\def\R{{\mathbb R}}
+\def\I{{\mathbb I}}
+\def\X{{\mathcal X}}
+\def\P{{\mathcal P}}
+\def\Y{{\mathcal Y}}
+
+% Le d des dérivées doit être droit: \frac{\dd x}{\dd t}
+\newcommand{\dd}{\text{d}}
+
+% La dérivée temporelle, tellement courante en physique, avec les d droits
+\newcommand{\ddt}[1]{\frac{\dd #1}{\dd t}}
+
+% Des parenthèses, crochets et accolades qui s'adaptent automatiquement à la 
+% taille de ce qu'il y a dedans
+\newcommand{\pa}[1]{\left(#1\right)}
+\newcommand{\pac}[1]{\left[#1\right]}
+\newcommand{\paa}[1]{\left\{#1\right\}}
+\captionsetup{justification=centering}
+% Un raccourci pour écrire une constante
+\newcommand{\cte}{\text{C}^{\text{te}}}
+
+% Pour faire des indices en mode texte (comme les énergie potentielles)
+\newcommand{\e}[1]{_{\text{#1}}}
+
+% Le produit vectoriel a un nom bizarre:
+\newcommand{\vectoriel}{\wedge}
+
+%%%% debut macro %%%%
+\makeatletter
+\renewcommand{\thefigure}{\ifnum \c@section>\z@ \thesection.\fi
+ \@arabic\c@figure}
+\@addtoreset{figure}{section}
+\makeatother
+
+
+\setbeamertemplate{caption}[numbered]
+%%%% fin macro %%%%
