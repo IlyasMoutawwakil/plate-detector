@@ -1,10 +1,10 @@
-from keras.models import Model
-from keras.utils import Sequence
-from keras.layers import Reshape, Input, Activation, Conv2D, GlobalMaxPool2D, MaxPooling2D, GlobalAveragePooling2D, BatchNormalization, Flatten, Dense, Lambda, ZeroPadding2D, Dropout, DepthwiseConv2D
-from keras.layers.advanced_activations import LeakyReLU, ReLU
-from keras.layers.merge import concatenate
-from keras.optimizers import SGD, Adam, RMSprop
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+from tensorflow.keras.models import Model
+from tensorflow.keras.utils import Sequence
+from tensorflow.keras.layers import Reshape, Input, Activation, Conv2D, GlobalMaxPool2D, MaxPooling2D
+from tensorflow.keras.layers import GlobalAveragePooling2D, BatchNormalization, Flatten, Dense, Lambda
+from tensorflow.keras.layers import ZeroPadding2D, Dropout, DepthwiseConv2D, LeakyReLU, ReLU, concatenate
+from tensorflow.keras.optimizers import SGD, Adam, RMSprop
+from tensorflow.keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
 
 from imgaug import augmenters as iaa
 import matplotlib.pyplot as plt
@@ -18,15 +18,7 @@ from Yolo_V2_utils import *
 from Yolo_V2_extractors import *
 from Yolo_V2_preprocessing import *
 
-ROOT_DIR = '/root/jupyter/'
-DATA_DIR = ROOT_DIR + 'Deep_Learning/data/'
-MODEL_DIR = ROOT_DIR + 'Deep_Learning/models/'
-BACKEND_DIR = ROOT_DIR + 'Deep_Learning/backends/'
-
-FULL_YOLO_BACKEND_PATH  = BACKEND_DIR + "yolo_v2.weights"
-SQUEEZENET_BACKEND_PATH = BACKEND_DIR + "squeezenet_backend.h5"
-MOBILENET_BACKEND_PATH  = BACKEND_DIR + "mobilenet_backend.h5"
-
+seen, total_recall = None, None
 
 class YOLO(object):
     '''Le model YOLO est un algorithme de détection basé sur les techniques d'apprentissage profond.
@@ -42,7 +34,8 @@ class YOLO(object):
                  max_box_per_image,
                  anchors):
         '''La fonction/méthode d'initialisation du model YOLO'''
-
+        
+#         super(YOLO, self).__init__()
         self.input_size = input_size
         self.labels   = list(labels)
         self.nb_class = len(self.labels)
@@ -73,22 +66,22 @@ class YOLO(object):
         else:
             raise Exception('Architecture n\'est pas supportée!')
 
-        print(self.feature_extractor.get_output_shape()) # Visualisation de la forme de la sortie de l'extrateur de caractéristiques
         self.grid_h, self.grid_w = self.feature_extractor.get_output_shape() # Définition de la taille des grilles en fonction de la sortie de l'extracteur
         features = self.feature_extractor.extract(input_image) # Définir le Vecteur de caractéristiques
 
         # Créer la dérnière couche de détection
-        output = Conv2D(self.nb_box * (4 + 1 + self.nb_class), # 4 coordonnées, 1 prob d'existence, C classes d'objets, A anchors
+        # 4 coordonnées, 1 prob d'existence, C classes d'objets, A anchors
+        output = Conv2D(self.nb_box * (4 + 1 + self.nb_class), 
                         (1,1), strides=(1,1),
                         padding='same',
-                        name='Couche_de_détection',
+                        name='Couche_de_detection',
                         kernel_initializer='lecun_normal')(features)
 
         # Transformer le vecteur de sortie en tenseur de la forme finale
-        output = Reshape((self.grid_h, self.grid_w, self.nb_box, 4 + 1 + self.nb_class))(output)
-        output = Lambda(lambda args: args[0])([output, self.true_boxes])
+        output = Reshape((self.grid_h, self.grid_w, self.nb_box, 4 + 1 + self.nb_class), name = "reshape")(output)
+        output = Lambda(lambda args: args[0], name = "Lambda")([output, self.true_boxes])
 
-        self.model = Model([input_image, self.true_boxes], output)
+        self.model = Model([input_image, self.true_boxes], output, name = "Yolo")
 
         ######################################################
         # initialisation des poids de la couche de détection #
@@ -118,7 +111,7 @@ class YOLO(object):
 
         mask_shape = tf.shape(y_true)[:4]
 
-        cell_x = tf.to_float(tf.reshape(tf.tile(tf.range(self.grid_w), [self.grid_h]), (1, self.grid_h, self.grid_w, 1, 1)))
+        cell_x = tf.cast(tf.reshape(tf.tile(tf.range(self.grid_w), [self.grid_h]), (1, self.grid_h, self.grid_w, 1, 1)), tf.float32)
         cell_y = tf.transpose(cell_x, (0,2,1,3,4))
 
         cell_grid = tf.tile(tf.concat([cell_x,cell_y], -1), [self.batch_size, 1, 1, self.nb_box, 1])
@@ -126,9 +119,9 @@ class YOLO(object):
         coord_mask = tf.zeros(mask_shape)
         conf_mask  = tf.zeros(mask_shape)
         class_mask = tf.zeros(mask_shape)
-
-        seen = tf.Variable(0.) # Compteur des élements traités du batche
-        total_recall = tf.Variable(0.) # Erreur/Coût final
+        
+        seen = tf.Variable(0., trainable=False) # Compteur des élements traités du batche
+        total_recall = tf.Variable(0., trainable=False) # Erreur/Coût final
 
         #######################################################
         # Ajustement et définition des variables de prédiction#
@@ -219,21 +212,21 @@ class YOLO(object):
         # Les prédicteurs de fidélité/confidence/sûreté à pénaliser avec les poids de pénalisation
         # Celui qui sait ne parle pas, celui qui parle ne sait - Lao-Tseu
         best_ious = tf.reduce_max(iou_scores, axis=4)
-        conf_mask = conf_mask + tf.to_float(best_ious < 0.6) * (1 - y_true[..., 4]) * self.no_object_scale # Celui qui ne doit pas parler
+        conf_mask = conf_mask + tf.cast(best_ious < 0.6, tf.float32) * (1 - y_true[..., 4]) * self.no_object_scale # Celui qui ne doit pas parler
         conf_mask = conf_mask + y_true[..., 4] * self.object_scale # Celui qui doit savoir
 
         # Les prédicteurs des classes qui seront pénalisés avec les poids de pénalisation
         class_mask = y_true[..., 4] * tf.gather(self.class_wt, true_box_class) * self.class_scale
 
         # Les prédicteurs des anchors des grilles qui seront pénalisés : Ceux qui ne doivent pas détecter cet objet
-        no_boxes_mask = tf.to_float(coord_mask < self.coord_scale/2.)
+        no_boxes_mask = tf.cast(coord_mask < self.coord_scale/2., tf.float32)
 
         # Incrémentation du compteur de batches
-        seen = tf.assign_add(seen, 1.)
+        seen = tf.compat.v1.assign_add(seen, 1.)
 
         # Le calcul pendant l'échauffement se fait différemment,
         # donc on introduit une fonction de conditionnement
-        true_box_xy, true_box_wh, coord_mask = tf.cond(tf.less(seen, self.warmup_batches+1), # Valeur booléenne caractérisant les époques d'échauffement
+        true_box_xy, true_box_wh, coord_mask = tf.cond(tf.less(seen, self.warmup_batches+1), 
                                                        lambda: [true_box_xy + (0.5 + cell_grid) * no_boxes_mask,
                                                        true_box_wh + tf.ones_like(true_box_wh) * \
                                                        np.reshape(self.anchors, [1,1,1,self.nb_box,2]) * \
@@ -247,9 +240,9 @@ class YOLO(object):
         ######################################
 
         # Calcul du nombre des erreurs prises en consedération.
-        nb_coord_box = tf.reduce_sum(tf.to_float(coord_mask > 0.0))
-        nb_conf_box  = tf.reduce_sum(tf.to_float(conf_mask  > 0.0))
-        nb_class_box = tf.reduce_sum(tf.to_float(class_mask > 0.0))
+        nb_coord_box = tf.reduce_sum(tf.cast(coord_mask > 0.0, tf.float32))
+        nb_conf_box  = tf.reduce_sum(tf.cast(conf_mask  > 0.0, tf.float32))
+        nb_class_box = tf.reduce_sum(tf.cast(class_mask > 0.0, tf.float32))
 
         # Calcul final des coûts de régression : on utilise la moyenne des erreurs carrées pondérées (par les pénalités choisies)
         loss_xy    = tf.reduce_sum(tf.square(true_box_xy-pred_box_xy)     * coord_mask) / (nb_coord_box + 1e-6) / 2.
@@ -270,18 +263,18 @@ class YOLO(object):
 
         if self.debug:
             nb_true_box = tf.reduce_sum(y_true[..., 4])
-            nb_pred_box = tf.reduce_sum(tf.to_float(true_box_conf > 0.5) * tf.to_float(pred_box_conf > 0.3))
+            nb_pred_box = tf.reduce_sum(tf.cast(true_box_conf > 0.5, tf.float32) * tf.cast(pred_box_conf > 0.3, tf.float32))
 
             current_recall = nb_pred_box/(nb_true_box + 1e-6)
-            total_recall = tf.assign_add(total_recall, current_recall)
+            total_recall = tf.compat.v1.assign_add(total_recall, current_recall)
 
-            loss = tf.Print(loss, [loss_xy], message='Loss XY \t', summarize=1000)
-            loss = tf.Print(loss, [loss_wh], message='Loss WH \t', summarize=1000)
-            loss = tf.Print(loss, [loss_conf], message='Loss Conf \t', summarize=1000)
-            loss = tf.Print(loss, [loss_class], message='Loss Class \t', summarize=1000)
-            loss = tf.Print(loss, [loss], message='Total Loss \t', summarize=1000)
-            loss = tf.Print(loss, [current_recall], message='Current Recall \t', summarize=1000)
-            loss = tf.Print(loss, [total_recall/seen], message='Average Recall \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [loss_xy], message='Loss XY \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [loss_wh], message='Loss WH \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [loss_conf], message='Loss Conf \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [loss_class], message='Loss Class \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [loss], message='Total Loss \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [current_recall], message='Current Recall \t', summarize=1000)
+            loss = tf.compat.v1.Print(loss, [total_recall/seen], message='Average Recall \t', summarize=1000)
 
         return loss
 
@@ -301,7 +294,8 @@ class YOLO(object):
               no_object_scale,             # Pénalité sur les fausse positive : une détection d'objets inexistant
               coord_scale,                 # Pénalité sur les coordonnées du centre de l'objet
               class_scale,                 # Pénalité sur les dimensions de l'objet détecté
-              saved_weights_dir=MODEL_DIR, # Chemin d'enregistrement du model
+              saved_weights_dir,           # Chemin d'enregistrement du model
+              logs_dir,
               debug=False                  # Activer/Désactiver la visualisation
               ):
 
@@ -317,8 +311,7 @@ class YOLO(object):
         ########################################
 
         # Configuretion des générateurs de données
-        generator_config =
-        {
+        generator_config = {
             'IMAGE_H'         : self.input_size,
             'IMAGE_W'         : self.input_size,
             'GRID_H'          : self.grid_h,
@@ -360,16 +353,16 @@ class YOLO(object):
                                    verbose=1)
 
         # ModelCheckpoint pour le sauvegarde des models
-        file_path = saved_weights_dir + "EPOCH_{epoch:02d}_Validation_{val_loss:.2f}.h5"
+        file_path = saved_weights_dir + "EPOCH_{epoch:02d}.h5"
         checkpoint = ModelCheckpoint(file_path,
                                      monitor='val_loss',
                                      verbose=1,
                                      save_best_only=True,
                                      mode='min',
-                                     period=1)
+                                     save_freq='epoch')
 
         # Tensorboard pour la visualisation
-        tensorboard = TensorBoard(log_dir=os.path.expanduser(ROOT_DIR + '/Deep_Learning/logs_dir/'),
+        tensorboard = TensorBoard(log_dir=logs_dir,
                                   histogram_freq=0,
                                   write_graph=True,
                                   write_images=False)
@@ -384,8 +377,9 @@ class YOLO(object):
                                  epochs           = warmup_epochs + nb_epochs,
                                  verbose          = 1 if debug else 0,
                                  validation_data  = valid_generator,
+                                 validation_freq  = 1,
                                  validation_steps = len(valid_generator) * valid_times,
-                                 callbacks        = [early_stop, checkpoint, tensorboard],
+                                 callbacks        = [tensorboard, checkpoint, early_stop],
                                  workers          = 3,
                                  max_queue_size   = 8)
 

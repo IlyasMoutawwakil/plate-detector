@@ -1,19 +1,15 @@
-from keras.models import Model
-from keras.utils import Sequence
-from keras.layers import Reshape, GlobalMaxPool2D, MaxPooling2D
-from keras.layers import ZeroPadding2D, Conv2D, BatchNormalization, Input, Dropout, DepthwiseConv2D
-from keras.layers import ReLU, GlobalAveragePooling2D, GlobalMaxPool2D, Reshape, Activation
-from keras.layers.advanced_activations import LeakyReLU
-from keras.layers.merge import concatenate
-from keras.activations import relu
+from tensorflow.keras.models import Model
+from tensorflow.keras.utils import Sequence
+from tensorflow.keras.layers import Reshape, GlobalMaxPool2D, MaxPooling2D, concatenate
+from tensorflow.keras.layers import ZeroPadding2D, Conv2D, BatchNormalization, Input, Dropout, DepthwiseConv2D
+from tensorflow.keras.layers import LeakyReLU, ReLU, GlobalAveragePooling2D, GlobalMaxPool2D, Reshape, Activation
 import tensorflow as tf
 
-ROOT_DIR = '/root/jupyter/'
-BACKEND_DIR = ROOT_DIR + 'Deep_Learning/backends/'
 
-FULL_YOLO_BACKEND_PATH  = BACKEND_DIR + "yolo_v2.weights"   # should be hosted on the server
-SQUEEZENET_BACKEND_PATH = BACKEND_DIR + "squeezenet_backend.h5"  # should be hosted on the server
-MOBILENET_BACKEND_PATH  = BACKEND_DIR + "mobilenet_backend.h5"   # should be hosted on the server
+ROOT_DIR = 'C:/Users/utilisateur/Documents/GitHub/plate-detector/'
+BACKEND_DIR = ROOT_DIR + 'backends/'
+SQUEEZENET_BACKEND_PATH = BACKEND_DIR + "squeezenet_backend.h5"
+MOBILENET_BACKEND_PATH  = BACKEND_DIR + "mobilenet_backend.h5"
 
 class BaseFeatureExtractor(object):
     """docstring for ClassName"""

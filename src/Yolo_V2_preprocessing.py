@@ -4,7 +4,8 @@ import copy
 import numpy as np
 import imgaug as ia
 from imgaug import augmenters as iaa
-from keras.utils import Sequence
+from tensorflow.keras.utils import Sequence
+
 from Yolo_V2_utils import *
 
 def parse_annotation(data_dir, datasets, labels=[]):
@@ -75,7 +76,7 @@ class BatchGenerator(Sequence):
                                 ]),
                      iaa.Add((-10, 10), per_channel=0.5), # change brightness of images (by -10 to 10 of original value)
                      iaa.Multiply((0.5, 1.5), per_channel=0.5), # change brightness of images (50-150% of original value)
-                     iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5), # improve or worsen the contrast
+                     iaa.contrast.LinearContrast((0.5, 2.0), per_channel=0.5), # improve or worsen the contrast
                      ], random_order=True)], random_order=True)
 
         if shuffle: np.random.shuffle(self.images)
