@@ -18,9 +18,7 @@ from Yolo_V2_utils import *
 from Yolo_V2_extractors import *
 from Yolo_V2_preprocessing import *
 
-seen, total_recall = None, None
-
-class YOLO(object):
+class YOLO(Model):
     '''Le model YOLO est un algorithme de détection basé sur les techniques d'apprentissage profond.
        Puisqu'il est toujours en cours de développement, en particulier sa tête de détection et sa fonction de coût,
        on implémente dans ce script la deuxième version YOLO_V2/YOLO9000 qui est plus stable en terme de gradient
@@ -35,7 +33,7 @@ class YOLO(object):
                  anchors):
         '''La fonction/méthode d'initialisation du model YOLO'''
         
-#         super(YOLO, self).__init__()
+        super(YOLO, self).__init__()
         self.input_size = input_size
         self.labels   = list(labels)
         self.nb_class = len(self.labels)
@@ -99,7 +97,10 @@ class YOLO(object):
 
         # Visualiser la structure du model final
         self.model.summary()
-
+        
+        
+        
+        
     def custom_loss(self, y_true, y_pred):
         '''Une implémentation de la fonction de coût comme décrite par Joseph Redmon pour Yolo_V2.
            Les nouveauté dans cette implémentation est l'utilisation de la détection par anchors.
@@ -275,12 +276,12 @@ class YOLO(object):
             loss = tf.compat.v1.Print(loss, [loss], message='Total Loss \t', summarize=1000)
             loss = tf.compat.v1.Print(loss, [current_recall], message='Current Recall \t', summarize=1000)
             loss = tf.compat.v1.Print(loss, [total_recall/seen], message='Average Recall \t', summarize=1000)
-
+        
         return loss
-
+    
     def load_weights(self, weight_path):
         self.model.load_weights(weight_path)
-
+    
     def train(self,
               train_imgs,                  # Les images sur lesquelles le model sera entrainé
               valid_imgs,                  # Les images sur lesquelles la performance du model sera validé
@@ -382,7 +383,7 @@ class YOLO(object):
                                  callbacks        = [tensorboard, checkpoint, early_stop],
                                  workers          = 3,
                                  max_queue_size   = 8)
-
+    
     def predict(self, image):
         '''Fonction de prédiction des coordonnées de l'objet dans une image'''
 
