@@ -5,11 +5,19 @@ from tensorflow.keras.layers import ZeroPadding2D, Conv2D, BatchNormalization, I
 from tensorflow.keras.layers import LeakyReLU, ReLU, GlobalAveragePooling2D, GlobalMaxPool2D, Reshape, Activation
 import tensorflow as tf
 
+<<<<<<< HEAD
 
 ROOT_DIR = 'C:/Users/utilisateur/Documents/GitHub/plate-detector/'
 BACKEND_DIR = ROOT_DIR + 'backends/'
 SQUEEZENET_BACKEND_PATH = BACKEND_DIR + "squeezenet_backend.h5"
 MOBILENET_BACKEND_PATH  = BACKEND_DIR + "mobilenet_backend.h5"
+=======
+ROOT_DIR = "/gdrive/My Drive/Colab Notebooks/plate-detector/"
+BACKEND_DIR = ROOT_DIR + 'backends/'
+
+SQUEEZENET_BACKEND_PATH = BACKEND_DIR + "squeezenet_backend.h5"  # should be hosted on the server
+MOBILENET_BACKEND_PATH  = BACKEND_DIR + "mobilenet_backend.h5"   # should be hosted on the server
+>>>>>>> 465d6c8f4f035fb2ee5ab96aa3f139dd0a62fcce
 
 class BaseFeatureExtractor(object):
     """docstring for ClassName"""

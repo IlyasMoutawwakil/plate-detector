@@ -12,14 +12,31 @@ The only problem with this approach was the dataset. I could've used a dataset f
 Only with some image processing operations (OpenCV) and a negative background dataset (images of random scenes), I built a data generator that generates images with car plates (Moroccan car plate) along with the needed annotations (coordinates) in no time. And to make the detection harder I added noise on top of the images, I tilted the car plates and rotated them along both axes.
 
 <p align="center">
-  <img src="tex\figures\Gen_process.PNG" width="500" alt="1">
+  <img src="tex/figures/Gen_process.PNG" width="400" alt="Gen_process">
+  <img src="tex/figures/Data_gen.PNG" width="400" alt="Data_gen">
 </p>
 
 And for the detection I re-implemented the YOLO algorithm in Google's ML framework TensorFlow.
 
+<p align="center">
+  <img src="tex/figures/YOLOv2.png" width="400" alt="YOLOv2">
+</p>
+
 ## Let's make it even more challenging
 To make this solution cheaper and to implement it in small embedded systems such as Raspberry Pi, I went through different CNN architectures and modified the original features extractor (Darknet) with Google and Stanford's fastest (SqueezeNet and MobileNet).
+
+<p align="center">
+  <img src="tex/figures/SqzNet.PNG" width="300" alt="SqzNet">
+  <img src="tex/figures/MobNet.PNG" width="300" alt="MobNet">
+  MobNet
+</p>
+
 With these modifications I achieved real time (30 fps) detection with less memory, less training time and less computation.
 
+<p align="center">
+  <img src="tex/figures/STREAM_1.png" width="400" alt="Stream1">
+  <img src="tex/figures/STREAM_2.png" width="400" alt="Stream2">
+</p>
+
 ## Results
-You could see the results of my work as well as the whole project's goal and steps in my presentation (made with love aka Latex ;).
+You could see the results of my work as well as the whole project's goal and steps in the final presentation.

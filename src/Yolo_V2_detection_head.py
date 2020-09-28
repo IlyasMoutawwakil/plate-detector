@@ -227,6 +227,10 @@ class YOLO(Model):
 
         # Le calcul pendant l'échauffement se fait différemment,
         # donc on introduit une fonction de conditionnement
+<<<<<<< HEAD
+=======
+        # Valeur booléenne caractérisant les époques d'échauffement
+>>>>>>> 465d6c8f4f035fb2ee5ab96aa3f139dd0a62fcce
         true_box_xy, true_box_wh, coord_mask = tf.cond(tf.less(seen, self.warmup_batches+1), 
                                                        lambda: [true_box_xy + (0.5 + cell_grid) * no_boxes_mask,
                                                        true_box_wh + tf.ones_like(true_box_wh) * \
@@ -363,7 +367,11 @@ class YOLO(Model):
                                      save_freq='epoch')
 
         # Tensorboard pour la visualisation
+<<<<<<< HEAD
         tensorboard = TensorBoard(log_dir=logs_dir,
+=======
+        tensorboard = TensorBoard(log_dir=ROOT_DIR + 'logs_dir/',
+>>>>>>> 465d6c8f4f035fb2ee5ab96aa3f139dd0a62fcce
                                   histogram_freq=0,
                                   write_graph=True,
                                   write_images=False)
