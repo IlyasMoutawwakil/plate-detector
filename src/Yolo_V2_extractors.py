@@ -8,10 +8,9 @@ from keras.layers.merge import concatenate
 from keras.activations import relu
 import tensorflow as tf
 
-ROOT_DIR = '/root/jupyter/'
-BACKEND_DIR = ROOT_DIR + 'Deep_Learning/backends/'
+ROOT_DIR = "/gdrive/My Drive/Colab Notebooks/plate-detector/"
+BACKEND_DIR = ROOT_DIR + 'backends/'
 
-FULL_YOLO_BACKEND_PATH  = BACKEND_DIR + "yolo_v2.weights"   # should be hosted on the server
 SQUEEZENET_BACKEND_PATH = BACKEND_DIR + "squeezenet_backend.h5"  # should be hosted on the server
 MOBILENET_BACKEND_PATH  = BACKEND_DIR + "mobilenet_backend.h5"   # should be hosted on the server
 

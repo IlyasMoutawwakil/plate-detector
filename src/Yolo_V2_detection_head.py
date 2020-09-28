@@ -81,7 +81,7 @@ class YOLO(object):
         output = Conv2D(self.nb_box * (4 + 1 + self.nb_class), # 4 coordonnées, 1 prob d'existence, C classes d'objets, A anchors
                         (1,1), strides=(1,1),
                         padding='same',
-                        name='Couche_de_détection',
+                        name='Couche_de_detection',
                         kernel_initializer='lecun_normal')(features)
 
         # Transformer le vecteur de sortie en tenseur de la forme finale
@@ -233,7 +233,8 @@ class YOLO(object):
 
         # Le calcul pendant l'échauffement se fait différemment,
         # donc on introduit une fonction de conditionnement
-        true_box_xy, true_box_wh, coord_mask = tf.cond(tf.less(seen, self.warmup_batches+1), # Valeur booléenne caractérisant les époques d'échauffement
+        # Valeur booléenne caractérisant les époques d'échauffement
+        true_box_xy, true_box_wh, coord_mask = tf.cond(tf.less(seen, self.warmup_batches+1), 
                                                        lambda: [true_box_xy + (0.5 + cell_grid) * no_boxes_mask,
                                                        true_box_wh + tf.ones_like(true_box_wh) * \
                                                        np.reshape(self.anchors, [1,1,1,self.nb_box,2]) * \
@@ -317,8 +318,7 @@ class YOLO(object):
         ########################################
 
         # Configuretion des générateurs de données
-        generator_config =
-        {
+        generator_config = {
             'IMAGE_H'         : self.input_size,
             'IMAGE_W'         : self.input_size,
             'GRID_H'          : self.grid_h,
@@ -369,7 +369,7 @@ class YOLO(object):
                                      period=1)
 
         # Tensorboard pour la visualisation
-        tensorboard = TensorBoard(log_dir=os.path.expanduser(ROOT_DIR + '/Deep_Learning/logs_dir/'),
+        tensorboard = TensorBoard(log_dir=ROOT_DIR + 'logs_dir/',
                                   histogram_freq=0,
                                   write_graph=True,
                                   write_images=False)

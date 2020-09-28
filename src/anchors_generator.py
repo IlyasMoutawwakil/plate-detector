@@ -91,7 +91,7 @@ def run_kmeans(ann_dims, anchor_num):
         prev_assignments = assignments.copy()
         old_distances = distances.copy()
 
-def anchors_gen(anns_dir, num_anchors):
+def anchors_gen(anns_dir, num_anchors, max_dim):
     '''Une fonction permettant de trouver les meilleurs n anchors représentants des données'''
     ind = 0
     train_images = []
@@ -112,11 +112,9 @@ def anchors_gen(anns_dir, num_anchors):
 
                 ind += 1
 
-            if count > max_objects:
-                max_objects = count
 
-    grid_w = MAX_DIM/19 # n'affecte pas beaucoup les résultats (car trés grands)
-    grid_h = MAX_DIM/19 # mais c'est mieux d'utiliser 19 pour SqueezeNet et 39 pour MobileNet
+    grid_w = max_dim/19 # n'affecte pas beaucoup les résultats (car trés grands)
+    grid_h = max_dim/19 # mais c'est mieux d'utiliser 19 pour SqueezeNet et 39 pour MobileNet
 
 
     annotation_dims = []
