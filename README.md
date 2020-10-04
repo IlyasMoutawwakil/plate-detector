@@ -5,7 +5,7 @@ A machine learning algorithm for Moroccan car plates detection, trained only wit
 This work is part of my TIPE project during my second year in CPGE (2019).
 
 ## Problem description
-Car plates detection is an image processing that like many others can be solved with better accuracy with deep learning algorithms.
+Car plates detection is an image processing task that like many others can be solved with better accuracy with deep learning algorithms.
 The only problem with this approach was the dataset. I could've used a dataset from the internet, but since this dataset problem occurs in many occasions as the bottleneck of machine learning, I decided to build this project with zero real data.
 
 ## Solution
