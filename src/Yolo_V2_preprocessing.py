@@ -1,21 +1,24 @@
 import os
 import cv2
 import copy
+import sys
 import numpy as np
 import imgaug as ia
 from imgaug import augmenters as iaa
-from tensorflow.keras.utils import Sequence
-
+from keras.utils import Sequence
 from Yolo_V2_utils import *
 
 def parse_annotation(data_dir, datasets, labels=[]):
     '''Une fonction permettant de regrouper toutes les données en une seule variable'''
-
+    
+    img_idx = 0
     all_imgs = []
     seen_labels = {}
     for dataset in datasets :
         imgs_dir = data_dir + dataset + '/imgs/'
         anns_dir = data_dir + dataset + '/anns/'
+        imgs_num = len(os.listdir(anns_dir))
+        print(imgs_num)
         for img_ in sorted(os.listdir(imgs_dir)):
             img = {'object' : []} # img = {'object' : [obj], 'filename' : , 'height' : , 'width' : }
 
@@ -39,7 +42,14 @@ def parse_annotation(data_dir, datasets, labels=[]):
                 seen_labels[obj['name']] = 1
 
             all_imgs += [img]
-
+            
+            prog = (img_idx / imgs_num) * 100
+            if int(prog) == prog:
+                sys.stdout.write("\r%d%%" %prog)
+                sys.stdout.flush()
+            
+            img_idx += 1
+            
     return all_imgs, seen_labels
 
 class BatchGenerator(Sequence):
@@ -76,7 +86,7 @@ class BatchGenerator(Sequence):
                                 ]),
                      iaa.Add((-10, 10), per_channel=0.5), # change brightness of images (by -10 to 10 of original value)
                      iaa.Multiply((0.5, 1.5), per_channel=0.5), # change brightness of images (50-150% of original value)
-                     iaa.contrast.LinearContrast((0.5, 2.0), per_channel=0.5), # improve or worsen the contrast
+                     iaa.ContrastNormalization((0.5, 2.0), per_channel=0.5), # improve or worsen the contrast
                      ], random_order=True)], random_order=True)
 
         if shuffle: np.random.shuffle(self.images)

@@ -2,7 +2,6 @@ import random
 import os
 import numpy as np
 
-
 def IOU(ann, centroids):
     '''Une fonction qui calcule le IoU (Intersection sur réunion) pour une donnée par rapport aux centroids (Anchors)'''
 
@@ -27,17 +26,15 @@ def IOU(ann, centroids):
 
     return np.array(similarities)
 
-
 def avg_IOU(anns, centroids):
     '''Unne fonction qui calcule la moyenne des IoU'''
-    n, d = anns.shape
+    n,d = anns.shape
     som = 0.
 
     for i in range(anns.shape[0]):
-        som += max(IOU(anns[i], centroids))
+        som+= max(IOU(anns[i], centroids))
 
     return som/n
-
 
 def print_anchors(centroids):
     '''Une fonction qui renvoit les valeurs des anchors une fois le k-means est terminé'''
@@ -49,14 +46,12 @@ def print_anchors(centroids):
 
     r = "anchors: ["
     for i in sorted_indices[:-1]:
-        r += '%0.2f,%0.2f, ' % (anchors[i, 0], anchors[i, 1])
+        r += '%0.2f,%0.2f, ' % (anchors[i,0], anchors[i,1])
 
-    r += '%0.2f,%0.2f' % (anchors[sorted_indices[-1:], 0],
-                          anchors[sorted_indices[-1:], 1])
+    r += '%0.2f,%0.2f' % (anchors[sorted_indices[-1:],0], anchors[sorted_indices[-1:],1])
     r += "]"
 
     print(r)
-
 
 def run_kmeans(ann_dims, anchor_num):
     '''L'algorithme k-means est utilisé pour trouvé un nombre n des anchors représant tout les données
@@ -78,30 +73,24 @@ def run_kmeans(ann_dims, anchor_num):
         for i in range(ann_num):
             d = 1 - IOU(ann_dims[i], centroids)
             distances.append(d)
-        # distances.shape = (ann_num, anchor_num)
-        distances = np.array(distances)
+        distances = np.array(distances) # distances.shape = (ann_num, anchor_num)
 
-        print("itération {}: distances = {}".format(
-            iteration, np.sum(np.abs(old_distances-distances))))
+        print("itération {}: distances = {}".format(iteration, np.sum(np.abs(old_distances-distances))))
 
-        assignments = np.argmin(distances, axis=1)
+        assignments = np.argmin(distances,axis=1)
 
-        if (assignments == prev_assignments).all():
+        if (assignments == prev_assignments).all() :
             return centroids
 
-        centroid_sums = np.zeros((anchor_num, anchor_dim), np.float)
+        centroid_sums=np.zeros((anchor_num, anchor_dim), np.float)
         for i in range(ann_num):
-            centroid_sums[assignments[i]] += ann_dims[i]
+            centroid_sums[assignments[i]]+=ann_dims[i]
         for j in range(anchor_num):
-            centroids[j] = centroid_sums[j]/(np.sum(assignments == j) + 1e-6)
+            centroids[j] = centroid_sums[j]/(np.sum(assignments==j) + 1e-6)
 
         prev_assignments = assignments.copy()
         old_distances = distances.copy()
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 465d6c8f4f035fb2ee5ab96aa3f139dd0a62fcce
 def anchors_gen(anns_dir, num_anchors, max_dim):
     '''Une fonction permettant de trouver les meilleurs n anchors représentants des données'''
     ind = 0
@@ -110,42 +99,34 @@ def anchors_gen(anns_dir, num_anchors, max_dim):
 
     # Commence par une lecture de toutes les données qu'on le fournit
     for ann in sorted(os.listdir(anns_dir)):
-        with open(anns_dir + ann, mode='r') as file:
+        with open(anns_dir + ann, mode = 'r') as file:
             count = 0
             for line in file:
                 count += 1
-                name, ymin, xmin, ymax, xmax, height, width = line[:-1].split(
-                    ',')
+                name, ymin, xmin, ymax, xmax, height, width = line[:-1].split(',')
 
                 obj_ref = name + '_' + str(ind)
 
                 train_images += [obj_ref]
-                train_labels[obj_ref] = [int(height), int(width), int(ymin), int(
-                    xmin), int(ymax), int(xmax)]  # 256,256,24,111,232,164
+                train_labels[obj_ref] = [int(height), int(width), int(ymin), int(xmin), int(ymax), int(xmax)] # 256,256,24,111,232,164
 
                 ind += 1
 
-<<<<<<< HEAD
-    # n'affecte pas beaucoup les résultats (car trés grands)
-    grid_w = max_dim/19
-    grid_h = max_dim/19  # mais c'est mieux d'utiliser 19 pour SqueezeNet et 39 pour MobileNet
-=======
 
     grid_w = max_dim/19 # n'affecte pas beaucoup les résultats (car trés grands)
     grid_h = max_dim/19 # mais c'est mieux d'utiliser 19 pour SqueezeNet et 39 pour MobileNet
 
->>>>>>> 465d6c8f4f035fb2ee5ab96aa3f139dd0a62fcce
 
     annotation_dims = []
     for obj_ref in train_images:
         height, width, ymin, xmin, ymax, xmax = train_labels[obj_ref]
-        cell_w = width / grid_w
+        cell_w = width  / grid_w
         cell_h = height / grid_h
 
         relative_w = (xmax - xmin) / cell_w
         relative_h = (ymax - ymin) / cell_h
 
-        annotation_dims.append((relative_w, relative_h))
+        annotation_dims.append((relative_w,relative_h))
 
     annotation_dims = np.array(annotation_dims)
     centroids = run_kmeans(annotation_dims, num_anchors)

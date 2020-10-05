@@ -1,5 +1,6 @@
 import tensorflow as tf
 import numpy as np
+import cv2
 
 class BoundBox:
     ''' Un objet contenant les des informations sur un objet dans une image '''
@@ -97,7 +98,6 @@ def decode_netout(netout, anchors, nb_class, obj_threshold, nms_threshold):
     '''Une fonction pour décoder la sortie du réseau de neurones'''
 
     grid_h, grid_w, nb_box = netout.shape[:3]
-
     boxes = []
 
     # On décode la sortie tout les vecteur des grilles
@@ -111,7 +111,7 @@ def decode_netout(netout, anchors, nb_class, obj_threshold, nms_threshold):
             for b in range(nb_box):
                 # Les derniers éléments de classification et de présence/fidélité
                 classes = netout[row,col,b,5:]
-
+                
                 if np.sum(classes) > 0:
                     # Les quatre premiers éléments de régression : coordonnées et dimensions
                     x, y, w, h = netout[row,col,b,:4]
