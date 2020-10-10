@@ -1,0 +1,61 @@
+#cd ~
+
+#sudo apt-get update
+
+#sudo apt-get upgrade
+
+First, let's make ourselves a nice workspace directory:
+
+#mkdir opencv_workspace
+
+#cd opencv_workspace
+
+Now that we're in here, let's grab OpenCV:
+
+#sudo apt-get install git
+
+#git clone https://github.com/Itseez/opencv.git
+
+We've cloned the latest version of OpenCV here. Now let's get some essentials:
+
+Compiler: 
+#sudo apt-get install build-essential
+
+Libraries: 
+#sudo apt-get install cmake git libgtk2.0-dev pkg-config libavcodec-dev libavformat-dev libswscale-dev
+
+Python bindings and such: 
+#sudo apt-get install python-dev python-numpy libtbb2 libtbb-dev libjpeg-dev libpng-dev libtiff-dev libjasper-dev libdc1394-22-dev
+
+Finally, let's grab the OpenCV development library:
+#sudo apt-get install libopencv-dev
+
+To create positive imges from one unique sample use :
+#opencv_createsamples -img UniquePos.jpg -bg bg.txt -info info/info.lst -pngoutput info -maxxangle 0.5 -maxyangle 0.5 -maxzangle 0.5 -num number_of_samples
+
+Files Should be like:
+-Workspace
+--neg
+----negimages.jpg
+--info
+----posimages.jpg
+----info.lst  (/info/img_name.jpg num_of_obj bounding_box)
+--bg.txt      (/neg/img_name.jpg)
+
+Compress all of your positive images in one hot array :
+#opencv_createsamples -info info/info.lst -num number_of_positives -w 20 -h 20 -vec positives.vec
+
+Make a cascade directory for your cascade output :
+Workspace
+--neg
+----negimages.jpg
+--opencv
+--info
+----posimages.jpg
+----info.lst
+--data
+--positives.vec 
+--bg.txt
+
+Now let's run the train command:
+#opencv_traincascade -data data -vec positives.vec -bg bg.txt -numPos pos_num -numNeg half_of_pos_num -numStages about_20 -w 20 -h 20
