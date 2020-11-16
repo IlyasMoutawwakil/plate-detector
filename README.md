@@ -39,4 +39,4 @@ With these modifications I achieved real time (30 fps) detection with less memor
 </p>
 
 ## Results
-You could see the results of my work as well as the whole project's goal and steps in the final presentation.
+You could see the results of my work as well as the whole project's goal and steps in the <a href="tex/Latex presentation.pdf">final presentation</a>.
